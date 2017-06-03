@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>giggl Player</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-tubeplayer/2.1.0/jquery.tubeplayer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
+</head>
+<body>
+<div id='player'></div>
+<script>
+    jQuery(document).ready(function(){
+        var socket = io();
+        var current = null;
+        socket.emit('get');
+        jQuery("#player").tubeplayer({
+            onPlayerEnded: function () {
+                socket.emit('finished', true);
+            }
+        });
+        socket.on('play', function (id) {
+            jQuery("#player").tubeplayer('play', id);
+            current = id;
+        });
+        socket.on('current', function (song) {
+            if (song.id !== current && song.id !== null) {
+                jQuery("#player").tubeplayer('play', song.id);
+                current = song.id;
+            }
+        })
+    });
+</script>
+</body>
+</html>

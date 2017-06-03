@@ -73,18 +73,32 @@ function playVideo(id, target) {
 }
 
 function updateInfo(target) {
-    target.emit('current', {
-        'id': current !== null ? current : null,
-        'info': current !== null ? fetchVideoInfo(current): null
-    });
-    var prettyPlaylist = [];
-    playlist.forEach(function (item) {
-        prettyPlaylist.push({
-            'id': item,
-            'info': fetchVideoInfo(item)
+    if (current === null) {
+        target.emit('current', null);
+    } else {
+        fetchVideoInfo(current, function (err, info) {
+            target.emit('current', {
+                'id': current,
+                'info': info
+            });
         });
+    }
+    var prettyPlaylist = [];
+    var counter = 0;
+    playlist.forEach(function (item) {
+        fetchVideoInfo(item, function (err, info) {
+            prettyPlaylist.push({
+                'id': item,
+                'info': info
+            });
+            counter++;
+            if (counter === playlist.length) {
+                target.emit('list', prettyPlaylist);
+            }
+        });
+
     });
-    target.emit('list', prettyPlaylist);
+
 }
 
 app.use('/client', express.static(path.join(__dirname + '/client')));

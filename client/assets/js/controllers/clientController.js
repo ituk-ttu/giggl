@@ -1,6 +1,7 @@
 app.controller("clientController", ["$q", "$scope", "$filter", "socketService",
     function ($q, $scope, $filter, socketService) {
         var socket = socketService;
+        socket.emit("get", true);
         $scope.current = null;
         $scope.list = [];
         $scope.new = "";
@@ -13,5 +14,8 @@ app.controller("clientController", ["$q", "$scope", "$filter", "socketService",
         $scope.add = function () {
             socket.emit("add", $scope.new);
             $scope.new = "";
-        }
+        };
+        $scope.remove = function (index) {
+            socket.emit("remove", index);
+        };
     }]);

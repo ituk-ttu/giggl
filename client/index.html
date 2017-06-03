@@ -44,10 +44,25 @@
         <div class="well">
             <div class="form-group">
                 <form ng-submit="add()">
-                    <input type="text" class="form-control" placeholder="url" ng-model="new">
-                    <button class="btn btn-success" type="submit">Add</button>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="url" ng-model="new">
+                        <span class="input-group-btn">
+                            <button class="btn btn-success" type="submit">Add</button>
+                        </span>
+                    </div>
                 </form>
             </div>
+        </div>
+        <div class="well">
+            <table class="table">
+                <tr ng-repeat="item in list">
+                    <td>{{$index}}</td>
+                    <td>{{item.info.title}}</td>
+                    <td>
+                        <button class="btn btn-danger btn-small" type="button" ng-click="remove($index)"></button>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </div>

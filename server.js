@@ -1,4 +1,6 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
+var path = require('path');
 var http = require('http').Server(app);
 var io = require('socket.io').listen(http);
 var clk = require('chalk');
@@ -18,7 +20,7 @@ app.options('*', cors());
 var current = null;
 var playlist = [];
 
-app.get('/', function(req, res){
+app.get('/player', function(req, res){
     res.sendFile(__dirname + '/player.html');
 });
 
@@ -84,6 +86,8 @@ function updateInfo(target) {
     });
     target.emit('list', prettyPlaylist);
 }
+
+app.use('/client', express.static(path.join(__dirname + '/client')));
 
 http.listen(1337, function(){
     console.log(clk.green.bold('listening on *:' + 1337));

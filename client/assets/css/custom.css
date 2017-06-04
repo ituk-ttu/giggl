@@ -1,0 +1,19 @@
+.navbar {
+    border-radius: 0 !important;
+}
+.main {
+    margin-top: 35px !important;
+    margin-bottom: 20px;
+}
+body, html {
+    min-height: 100%;
+    font-family: 'Roboto', sans-serif !important;
+}
+.footer{
+    bottom: 5px;
+    width: 100%;
+    text-align: center;
+}
+.slider {
+    margin-top: 40px;
+}

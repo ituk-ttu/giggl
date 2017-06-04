@@ -18,20 +18,28 @@ var rl = readline.createInterface({
 });
 app.options('*', cors());
 var current = null;
+var playing = false;
 var playlist = [];
+var volume = 1;
 
-app.get('/player', function(req, res){
+app.get('/player', function (req, res) {
     res.sendFile(__dirname + '/player.html');
 });
+
+Array.prototype.insert = function (index, item) {
+    this.splice(index, 0, item);
+};
 
 io.on('connection', function (socket) {
     socket.on('add', function (url) {
         var video = getVideoId(url);
-        console.log(clk.blue('Adding video ') + clk.blue.bold(video.id));
-        if (video.service === 'youtube') {
-            playlist.push(video.id);
-            if (current === null) {
-                playVideo(video.id, io);
+        if (video !== undefined && video.id !== undefined) {
+            console.log(clk.blue('Adding video ') + clk.blue.bold(video.id));
+            if (video.service === 'youtube') {
+                playlist.push(video.id);
+                if (current === null) {
+                    next(io);
+                }
             }
         }
         updateInfo(io);
@@ -53,7 +61,18 @@ io.on('connection', function (socket) {
     });
     socket.on('get', function (ignored) {
         updateInfo(socket);
-    })
+        socket.emit('volume', volume);
+        socket.emit('playing', playing);
+    });
+    socket.on('playing', function (bool) {
+        playing = bool;
+        io.emit('playing', bool);
+    });
+    socket.on('volume', function (value) {
+        console.log(clk.blue('Set volume to ') + clk.blue.bold(value));
+        volume = value;
+        io.emit('volume', volume);
+    });
 });
 
 function next(io) {
@@ -83,26 +102,29 @@ function updateInfo(target) {
             });
         });
     }
-    var prettyPlaylist = [];
+    var prettyPlaylist = playlist.concat();
     var counter = 0;
-    playlist.forEach(function (item) {
-        fetchVideoInfo(item, function (err, info) {
-            prettyPlaylist.push({
-                'id': item,
-                'info': info
+    if (playlist.length > 0) {
+        prettyPlaylist.forEach(function (item, index, array) {
+            fetchVideoInfo(item, function (err, res) {
+                array[index] = ({
+                    id: item,
+                    info: res
+                });
+                counter++;
+                if (counter === playlist.length) {
+                    target.emit('list', prettyPlaylist);
+                }
             });
-            counter++;
-            if (counter === playlist.length) {
-                target.emit('list', prettyPlaylist);
-            }
         });
-
-    });
+    } else {
+        target.emit('list', []);
+    }
 
 }
 
 app.use('/client', express.static(path.join(__dirname + '/client')));
 
-http.listen(1337, function(){
+http.listen(1337, function () {
     console.log(clk.green.bold('listening on *:' + 1337));
 });

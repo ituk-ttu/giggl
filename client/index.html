@@ -11,60 +11,90 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-chart.js/1.1.1/angular-chart.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-socket-io/0.7.0/socket.min.js"></script>
-    <link href="assets/css/style.css" rel="stylesheet"/>
-    <link href="//bootswatch.com/flatly/bootstrap.min.css" rel="stylesheet"/>
     <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap-datepicker.js"></script>
+    <script src="assets/js/material-kit.js"></script>
+    <script src="assets/js/material.min.js"></script>
+    <script src="assets/js/jquery.nouislider.js"></script>
+    <script src="assets/js/nouislider.ng.js"></script>
     <script src="assets/js/app.js"></script>
     <script src="assets/js/controllers/clientController.js"></script>
     <script src="assets/js/services/socketService.js"></script>
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="//bootswatch.com/flatly/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/css/master.css">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/material-kit.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 <body>
 <div class="app-container" ng-controller="clientController">
-    <div class="navbar navbar-inverse">
+    <div class="navbar navbar-default navbar-static-top">
         <div class="container-fluid">
             <div class="navbar-header">
                 <div class="navbar-brand">giggl</div>
             </div>
         </div>
     </div>
-    <div class="container">
-        <div class="current well">
-            <span ng-if="current == null">
-                <h3 class="text-danger">No song queued!</h3>
-            </span>
-            <span ng-if="current != null">
-                <h3>Playing:</h3>
-                <p>{{current.info.title}}</p>
-            </span>
-        </div>
-        <div class="well">
-            <div class="form-group">
-                <form ng-submit="add()">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="url" ng-model="new">
-                        <span class="input-group-btn">
-                            <button class="btn btn-success" type="submit">Add</button>
+    <div class="main main-raised">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="current col-xs-12">
+                    <div class="col-lg-8 col-md-6 col-sm-12">
+                        <span ng-if="current == null">
+                            <h3 class="text-danger">No song queued!</h3>
+                        </span>
+                        <span ng-if="current != null">
+                            <h3 ng-if="playing" class="text-success">Playing:</h3>
+                            <h3 ng-if="!playing" class="text-danger">Paused:</h3>
+                            <p>{{current.info.title}} ({{prettyLength(current.info.duration)}})</p>
                         </span>
                     </div>
-                </form>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="col-sm-8 col-xs-12">
+                            <button class="btn btn-primary" ng-click="play(true)" ng-disabled="current == null">
+                                <i class="fa fa-play"></i>
+                            </button>
+                            <button class="btn btn-primary" ng-click="play(false)"><i class="fa fa-pause"></i></button>
+                            <button class="btn btn-primary" ng-click="skip()"><i class="fa fa-forward"></i></button>
+                        </div>
+                        <div class="col-sm-4 col-xs-12">
+                            <div slider ng-model="volume" start=1 end=100 class="slider"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="add col-xs-12">
+                    <div class="form-group">
+                        <form ng-submit="add()">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="url" ng-model="new">
+                                <span class="input-group-btn">
+                            <button class="btn btn-success" type="submit">Add</button>
+                        </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="playlist col-xs-12">
+                    <table class="table">
+                        <tr ng-repeat="item in list">
+                            <td>{{$index}}</td>
+                            <td>{{item.info.title}} ({{prettyLength(item.info.duration)}})</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" type="button" ng-click="remove($index)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
-        <div class="well">
-            <table class="table">
-                <tr ng-repeat="item in list">
-                    <td>{{$index}}</td>
-                    <td>{{item.info.title}}</td>
-                    <td>
-                        <button class="btn btn-danger btn-small" type="button" ng-click="remove($index)"></button>
-                    </td>
-                </tr>
-            </table>
-        </div>
     </div>
+    <p class="footer">
+        Built for <a href="http://ituk.ttu.ee">ITÜK</a> with
+        <i class="fa fa-heart"></i> and <i class="fa fa-coffee"></i>
+    </p>
 </div>
 </body>
 </html>

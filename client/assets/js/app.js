@@ -1,8 +1,10 @@
 var apiBase = "http://localhost:1337";
 
 var app = angular.module("gigglClient", [
-    'btford.socket-io'
+    'btford.socket-io',
+    'nouislider'
 ]).run(function($rootScope) {
+
     console.log("                      /^--^\\     /^--^\\     /^--^\\\r\n" +
         "                      \\____/     \\____/     \\____/\r\n" +
         "                     /      \\   /      \\   /      \\\r\n" +

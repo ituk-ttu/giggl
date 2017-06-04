@@ -6,8 +6,8 @@ app.controller("clientController", ["$q", "$scope", "$filter", "socketService",
         $scope.playing = false;
         $scope.list = [];
         $scope.new = "";
-        $scope.volume = 0;
-        var changedVolSelf = false;
+        $scope.volume = 1;
+        var changedVolSelf = true;
 
         socket.on("current", function (current) {
             $scope.current = current;

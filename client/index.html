@@ -52,11 +52,15 @@
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="col-sm-8 col-xs-12">
-                            <button class="btn btn-primary" ng-click="play(true)" ng-disabled="current == null">
+                            <button ng-if="!playing" class="btn btn-primary" ng-click="play(true)">
                                 <i class="fa fa-play"></i>
                             </button>
-                            <button class="btn btn-primary" ng-click="play(false)"><i class="fa fa-pause"></i></button>
-                            <button class="btn btn-primary" ng-click="skip()"><i class="fa fa-forward"></i></button>
+                            <button ng-if="playing" class="btn btn-primary" ng-click="play(false)">
+                                <i class="fa fa-pause"></i>
+                            </button>
+                            <button class="btn btn-primary" ng-click="skip()">
+                                <i class="fa fa-forward"></i>
+                            </button>
                         </div>
                         <div class="col-sm-4 col-xs-12">
                             <div slider ng-model="volume" start=1 end=100 class="slider"></div>
@@ -72,6 +76,22 @@
                             <button class="btn btn-success" type="submit">Add</button>
                         </span>
                             </div>
+                        </form>
+                        <form>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="title" ng-model="search">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-success" ng-click="clearSearch()">Clear</button>
+                                </span>
+                            </div>
+                            <md-list>
+                                <md-list-item class="md-2-line" ng-repeat="searchResult in searchResults">
+                                    <div ng-click="addById(searchResult.id.videoId)" class="md-list-item-text">
+                                        <h4>{{searchResult.snippet.title}}</h4>
+                                        <p>{{searchResult.snippet.channelTitle}}</p>
+                                    </div>
+                                </md-list-item>
+                            </md-list>
                         </form>
                     </div>
                 </div>

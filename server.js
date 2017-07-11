@@ -78,14 +78,16 @@ io.on('connection', function (socket) {
 function next(io) {
     console.log(clk.blue('Finished video ') + clk.blue.bold(current));
     if (playlist.length !== 0) {
-        playVideo(playlist.shift(), io);
+        setVideo(playlist.shift(), io);
     } else {
         current = null;
+        playing = false;
+        io.emit('playing', playing);
         console.log(clk.yellow('List empty, waiting for queue'));
     }
 }
 
-function playVideo(id, target) {
+function setVideo(id, target) {
     current = id;
     console.log(clk.green('Playing video ') + clk.green.bold(id));
     target.emit('play', id);

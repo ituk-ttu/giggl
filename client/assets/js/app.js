@@ -5,7 +5,7 @@ var app = angular.module("gigglClient", [
     'nouislider'
 ]).run(function($rootScope) {
 
-    console.log("                      /^--^\\     /^--^\\     /^--^\\\r\n" +
+    console.log("                      /^--^\\     /^ --^\\     /^--^\\\r\n" +
         "                      \\____/     \\____/     \\____/\r\n" +
         "                     /      \\   /      \\   /      \\\r\n" +
         "                    |        | |        | |        |\r\n" +

@@ -13,6 +13,7 @@
     jQuery(document).ready(function(){
         var socket = io();
         var current = null;
+        var playing = false;
         socket.emit('get');
         jQuery("#player").tubeplayer({
             onPlayerEnded: function () {
@@ -20,7 +21,8 @@
             }
         });
         socket.on('play', function (id) {
-            jQuery("#player").tubeplayer('play', id);
+            playing ? jQuery("#player").tubeplayer('play', id) :
+                      jQuery("#player").tubeplayer('cue', id);
             current = id;
         });
         socket.on('current', function (song) {
@@ -30,6 +32,7 @@
             }
         });
         socket.on('playing', function (bool) {
+            playing = bool;
             if (bool === true) {
                 jQuery("#player").tubeplayer("play");
             } else {

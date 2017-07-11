@@ -1,5 +1,5 @@
-app.controller("clientController", ["$q", "$scope", "$filter", "socketService",
-    function ($q, $scope, $filter, socketService) {
+ app.controller("clientController", ["$q", "$scope", "$filter", "socketService", "$http",
+    function ($q, $scope, $filter, socketService, $http) {
         var socket = socketService;
         socket.emit("get", true);
         $scope.current = null;
@@ -7,6 +7,7 @@ app.controller("clientController", ["$q", "$scope", "$filter", "socketService",
         $scope.list = [];
         $scope.new = "";
         $scope.volume = 1;
+        $scope.searchResults = [];
         var changedVolSelf = true;
 
         socket.on("current", function (current) {
@@ -38,6 +39,32 @@ app.controller("clientController", ["$q", "$scope", "$filter", "socketService",
             } else {
                 changedVolSelf = false;
             }
+        });
+        $scope.addById = function (id) {
+            socket.emit("add", "https://www.youtube.com/watch?v=" + id);
+            $scope.clearSearch();
+        };
+        $scope.clearSearch = function() {
+            $scope.searchResults = [];
+            $scope.search = "";
+        };
+        $scope.$watch('search', function (newVal, oldVal) {
+            if(!newVal) {
+                searchResults = [];
+                return;
+            }
+            $http.get('https://www.googleapis.com/youtube/v3/search', {
+                params: {
+                    key: 'AIzaSyAx4uk0wyOWLxB3n6YN19BQ_WiBIvjN2YA',
+                    type: 'video',
+                    maxResults: '5',
+                    part: 'id,snippet',
+                    fields: 'items/id,items/snippet/title,items/snippet/description,items/snippet/thumbnails/default,items/snippet/channelTitle',
+                    q: $scope.search
+                }
+            }).then(function(data) {
+                $scope.searchResults = data.data.items;
+            })
         });
         $scope.play = function (bool) {
             socket.emit('playing', bool)

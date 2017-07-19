@@ -6,29 +6,42 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-tubeplayer/2.1.0/jquery.tubeplayer.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
 </head>
 <body>
 <div id='player'></div>
 <script>
-    jQuery(document).ready(function(){
+    jQuery(document).ready(function () {
         var socket = io();
         var current = null;
         var playing = false;
-        socket.emit('get');
+        var speechVoice = 0;
+        window.utterances = [];
+
         jQuery("#player").tubeplayer({
+            autoPlay: false,
             onPlayerEnded: function () {
                 socket.emit('finished', true);
+            },
+            onPlayerLoaded: function () {
+                socket.emit('get', true);
+            },
+            onPlayerCued: function () {
+                jQuery("#player").tubeplayer("pause");
             }
         });
         socket.on('play', function (id) {
             playing ? jQuery("#player").tubeplayer('play', id) :
-                      jQuery("#player").tubeplayer('cue', id);
+                jQuery("#player").tubeplayer('cue', id);
             current = id;
         });
         socket.on('current', function (song) {
             if (song !== null && song.id !== current) {
-                jQuery("#player").tubeplayer('play', song.id);
-                current = song.id;
+                playing ? jQuery("#player").tubeplayer('play', song.id) :
+                    jQuery("#player").tubeplayer('cue', song.id);
+            } else if (song === null) {
+                current = null;
+                jQuery("#player").tubeplayer("pause");
             }
         });
         socket.on('playing', function (bool) {
@@ -48,6 +61,117 @@
                 current = song.id;
             }
         });
+
+
+
+        if (annyang) {
+            var play = function () {
+                if (current !== null) {
+                    if (!playing) speak("Ok");
+                    jQuery("#player").tubeplayer("play");
+                    socket.emit('playing', true);
+                } else {
+                    speak("I have nothing to play.")
+                }
+            };
+
+            var pause = function () {
+                if (playing) speak("Ok");
+                jQuery("#player").tubeplayer("pause");
+                socket.emit('playing', false);
+            };
+
+            var skip = function () {
+                if (current !== null) speak("Ok");
+                socket.emit('next', true);
+            };
+
+            var hello = function () {
+                speak("Hello!");
+            };
+
+            var bye = function () {
+                speak("Bye!");
+            };
+
+            var okay = function () {
+                speak("What?");
+            };
+
+            var listenTo = function (song) {
+                console.log(song);
+                $.get('https://www.googleapis.com/youtube/v3/search', {
+                    key: 'AIzaSyAx4uk0wyOWLxB3n6YN19BQ_WiBIvjN2YA',
+                    type: 'video',
+                    maxResults: '1',
+                    part: 'id,snippet',
+                    fields: 'items/id,items/snippet/title,items/snippet/description,items/snippet/thumbnails/default,items/snippet/channelTitle',
+                    q: song
+                }).done(function (data) {
+                    speak("Added " + data.items[0].snippet.title + " to the playlist");
+                    socket.emit("add", "https://www.youtube.com/watch?v=" + data.items[0].id.videoId);
+                    playing = true;
+                    socket.emit('playing', true)
+                });
+            };
+            // Let's define our first command. First the text we expect, and then the function it should call
+            var commands = {
+                'play music': play,
+                'continue music': play,
+                'stop music': pause,
+                'pause music': pause,
+                'play song': play,
+                'continue song': play,
+                'stop song': pause,
+                'pause song': pause,
+                'skip song': skip,
+                'hello Sarah': hello,
+                'hi Sarah': hello,
+                'hey Sarah': hello,
+                'listen to *song': listenTo,
+                'add *song': listenTo,
+                'bye Sarah': bye,
+                'goodbye Sarah': bye,
+                'okay Sarah': okay
+            };
+
+            // Add our commands to annyang
+            annyang.addCommands(commands);
+
+
+
+            // Start listening. You can call this here, or attach this call to an event, button, etc.
+            annyang.start();
+        }
+
+        if ('speechSynthesis' in window) {
+            speechSynthesis.getVoices().forEach(function (voice, index) {
+                if (voice.name === "Google UK English Female") speechVoice = index;
+            });
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                if (speechVoice === 0) {
+                    speechSynthesis.getVoices().forEach(function (voice, index) {
+                        if (voice.name === "Google UK English Female") speechVoice = index;
+                    });
+                }
+                var msg = new SpeechSynthesisUtterance();
+                var voices = speechSynthesis.getVoices();
+                msg.voice = voices[speechVoice];
+                msg.rate = 1;
+                msg.pitch = 1;
+                msg.text = text;
+
+                msg.onend = function (e) {
+                    console.log('Finished in ' + event.elapsedTime + ' seconds.');
+                };
+                console.log(text);
+                utterances.push(msg);
+                speechSynthesis.speak(msg);
+            }
+        }
     });
 </script>
 </body>

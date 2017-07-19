@@ -1,5 +1,3 @@
-var apiBase = "http://localhost:1337";
-
 var app = angular.module("gigglClient", [
     'btford.socket-io',
     'nouislider'

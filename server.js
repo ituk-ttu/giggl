@@ -20,7 +20,7 @@ app.options('*', cors());
 var current = null;
 var playing = false;
 var playlist = [];
-var volume = 1;
+var volume = 100;
 
 app.get('/player', function (req, res) {
     res.sendFile(__dirname + '/player.html');
@@ -65,8 +65,10 @@ io.on('connection', function (socket) {
         socket.emit('playing', playing);
     });
     socket.on('playing', function (bool) {
-        playing = bool;
-        io.emit('playing', bool);
+        if (current !== null) {
+            playing = bool;
+            io.emit('playing', bool);
+        }
     });
     socket.on('volume', function (value) {
         console.log(clk.blue('Set volume to ') + clk.blue.bold(value));

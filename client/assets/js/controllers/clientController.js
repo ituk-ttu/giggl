@@ -31,7 +31,15 @@
             socket.emit("remove", index);
         };
         $scope.prettyLength = function (seconds) {
-            return Math.floor(seconds / 60) + ":" + seconds % 60;
+            minutes = Math.floor(seconds / 60);
+            seconds = seconds % 60;
+            if (minutes === 0 && seconds === 0){
+                return "Live";
+            } else if(seconds < 10){
+                return minutes + ":0" + seconds;
+            } else {
+                return minutes + ":" + seconds;
+            }
         };
         $scope.$watch('volume', function (newVal, oldVal) {
             if (!changedVolSelf) {

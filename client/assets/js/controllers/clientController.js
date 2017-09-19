@@ -31,7 +31,7 @@
             socket.emit("remove", index);
         };
         $scope.prettyLength = function (seconds) {
-            minutes = Math.floor(seconds / 60);
+            var minutes = Math.floor(seconds / 60);
             seconds = seconds % 60;
             if (minutes === 0 && seconds === 0){
                 return "Live";
@@ -57,6 +57,10 @@
             $scope.search = "";
         };
         $scope.$watch('search', function (newVal, oldVal) {
+            if (newVal === ""){
+                $scope.searchResults = [];
+                $scope.search = ""
+            }
             if(!newVal) {
                 searchResults = [];
                 return;

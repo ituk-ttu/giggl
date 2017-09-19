@@ -17,3 +17,7 @@ body, html {
 .slider {
     margin-top: 40px;
 }
+div.md-list-item-text:hover{
+    color: #9c27b0;
+    cursor: pointer;
+}

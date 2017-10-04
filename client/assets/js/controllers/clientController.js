@@ -50,6 +50,10 @@
         });
         $scope.addById = function (id) {
             socket.emit("add", "https://www.youtube.com/watch?v=" + id);
+            if($scope.current === null){
+                socket.emit('playing', true);
+                $scope.playing = true;
+            }
             $scope.clearSearch();
         };
         $scope.clearSearch = function() {

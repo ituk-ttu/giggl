@@ -21,9 +21,6 @@ var current = null;
 var playing = false;
 var playlist = [];
 var volume = 100;
-var display = "asd";
-var times = [ 0, 0];
-var info2 = null;
 
 app.get('/player', function (req, res) {
     res.sendFile(__dirname + '/player.html');
@@ -42,7 +39,6 @@ io.on('connection', function (socket) {
                 playlist.push(video.id);
                 if (current === null) {
                     next(io);
-                    updateInfo(io);
                 }
             }
         }
@@ -55,18 +51,13 @@ io.on('connection', function (socket) {
     });
     socket.on('next', function (ignored) {
         console.log(clk.blue('Skipping current'));
-        times = [ 0, 0];
         next(io);
         updateInfo(io);
     });
     socket.on('finished', function (ignored) {
         console.log(clk.yellow('Finished current'));
-        times = [ 0, 0];
         next(io);
         updateInfo(io);
-    });
-    socket.on('display', function (ignored) {
-
     });
     socket.on('get', function (ignored) {
         updateInfo(socket);
@@ -75,13 +66,7 @@ io.on('connection', function (socket) {
     });
     socket.on('playing', function (bool) {
         if (current !== null) {
-            if (!playing) {
-                playing = bool;
-                step();
-            } else {
-                playing = bool;
-            }
-            updateInfo(io);
+            playing = bool;
             io.emit('playing', bool);
         }
     });
@@ -100,7 +85,6 @@ function next(io) {
         current = null;
         playing = false;
         io.emit('playing', playing);
-        io.emit('current', null);
         console.log(clk.yellow('List empty, waiting for queue'));
     }
 }
@@ -116,12 +100,9 @@ function updateInfo(target) {
         target.emit('current', null);
     } else {
         fetchVideoInfo(current, function (err, info) {
-            display = print();
-            info2 = info;
             target.emit('current', {
                 'id': current,
-                'info': info,
-                'display': display
+                'info': info
             });
         });
     }
@@ -144,33 +125,6 @@ function updateInfo(target) {
         target.emit('list', []);
     }
 
-}
-function step() {
-    if (!playing) return;
-    if (info2 !== null){
-        times[1] += 0.1;
-        if (times[1] >= 60) {
-            times[0] += 1;
-            times[1] -= 60;
-        }
-    }
-    if (playing){
-    updateInfo(io);
-    setTimeout(function(){
-            step() },
-        100);
-    }
-}
-
-function print() {
-    return `${pad0(Math.floor(times[0]), 2)}:${pad0(Math.floor(times[1]), 2)}`;
-}
-
-function pad0(value, count) {
-    var result = value.toString();
-    for (; result.length < count; --count)
-        result = '0' + result;
-    return result;
 }
 
 app.use('/client', express.static(path.join(__dirname + '/client')));

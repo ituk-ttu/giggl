@@ -70,6 +70,18 @@
                 </div>
                 <div class="add col-xs-12">
                     <div class="form-group">
+                        <div class="input-group">
+                            <form>
+                                <input type="file" class="form-control" placeholder="<empty>" id="loadedFile"/>
+                                <button ng-click="selectFile()">Choose File</button>
+                                {{loadStatus}}: {{additions}} / {{counter}}
+                            </form>
+                        </div>
+                        <button class="btn btn-success" ng-click="loadFile()">Load</button>
+                        <button class="btn btn-success" ng-click="autoPlay()">AutoPlay</button>
+                        <button class="btn btn-danger" ng-click="stopAutoPlay()">Stop AutoPlay</button>
+                    </div>
+                    <div class="form-group">
                         <form ng-submit="add()">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="url" ng-model="new">

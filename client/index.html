@@ -48,7 +48,11 @@
                         <span ng-if="current.id != null">
                             <h3 ng-if="playing" class="text-success">Playing:</h3>
                             <h3 ng-if="!playing" class="text-danger">Paused:</h3>
-                            <p>{{current.info.title}} ({{current.display}}/{{prettyLength(current.info.duration)}})</p>
+                            <p>{{current.info.title}} ({{current.display}}/{{prettyLength(current.info.duration)}})
+                            <button ng-click="share()" id="shareButton" style="float: right;">Share</button>
+                            <input title="click to copy" id="shareLink" type="text" readonly="readonly"
+                                   ng-model="shareLink"
+                                   hidden ng-click="copyLink()"></p>
                         </span>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">

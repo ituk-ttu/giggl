@@ -13,6 +13,7 @@
         $scope.additions = 0;
         $scope.loadStatus = "Loaded";
         $scope.autoPlayId = -1;
+        $scope.shareLink = "";
         var changedVolSelf = true;
 
         socket.on("current", function (current) {
@@ -39,13 +40,29 @@
             $scope.autoPlayId = setInterval($scope.randomAdd, 10000);
         };
         $scope.stopAutoPlay = function() {
-            console.log("StopAutoPlay()");
+            console.log("stopAutoPlay()");
             if ($scope.autoPlayId < 0) {
                 console.log("Nothing to stop.");
                 return;
             }
             clearInterval($scope.autoPlayId);
             $scope.autoPlayId = -1;
+        };
+        $scope.share = function() {
+            console.log("share()");
+            $scope.shareLink = "https://youtu.be/" + $scope.current.id;
+            document.getElementById("shareLink").hidden = false;
+        };
+        $scope.hideShare = function() {
+            let el = document.getElementById("shareLink");
+            el.hidden = true;
+            el.title = "click to copy";
+        };
+        $scope.copyLink = function() {
+            let el = document.getElementById("shareLink");
+            el.title = "copied";
+            el.select();
+            document.execCommand("copy");
         };
         $scope.loadFile = function() {
             console.log("loadFile()");
@@ -202,6 +219,10 @@
             }).then(function(data) {
                 $scope.searchResults = data.data.items;
             })
+        });
+        $scope.$watch('current', function(newVal, oldVal) {
+            $scope.hideShare();
+            document.getElementById("shareButton").hidden = newVal === null || newVal.id === null;
         });
         $scope.play = function (bool) {
             socket.emit('playing', bool)

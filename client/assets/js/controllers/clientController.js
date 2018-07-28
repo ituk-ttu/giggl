@@ -97,7 +97,7 @@
             return minutes * 60 + seconds;
         };
         $scope.isAllowed = function(name) {
-            if (name.length <= 3) {
+            if (name.length < 2) {
                 console.warn("Name too short: " + name.length);
                 return false;
             }

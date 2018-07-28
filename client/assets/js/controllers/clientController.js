@@ -69,7 +69,7 @@
             let file = document.getElementById("loadedFile").files[0];
             if (file) {
                 let reader = new FileReader();
-                reader.readAsText(file, "ANSI");
+                reader.readAsText(file, "utf-8");
                 reader.onload = $scope.onFileLoad;
             }
         };
@@ -104,12 +104,22 @@
             return minutes * 60 + seconds;
         };
         $scope.isAllowed = function(name) {
-            return name.length > 3 && name.length < 60 && $scope.isAscii(name);
+            if (name.length <= 3) {
+                console.warn("Name too short: " + name.length);
+                return false;
+            }
+
+            if (name.length >= 60) {
+                console.warn("Name too long: " + name.length);
+                return false;
+            }
+
+            return $scope.hasAllowedCharacters(name);
         };
-        $scope.isAscii = function(s) {
+        $scope.hasAllowedCharacters = function(s) {
             for (let c in s) {
-                if ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -&.()".indexOf(s[c]) < 0) {
-                    console.log("Invalid character: " + s[c].charCodeAt(0) + " (ASCII code)");
+                if ("abcdefghijklmnopqrsšzžtuvwõäöüxyABCDEFGHIJKLMNOPQRSŠZŽTUVWÕÄÖÜXY0123456789 -&.,()".indexOf(s[c]) < 0) {
+                    console.warn("Invalid character: " + s[c] + " (unicode: " + s[c].charCodeAt(0) + ")");
                     return false;
                 }
             }
@@ -122,7 +132,7 @@
             if ($scope.canAddRandom()) {
                 let randomName = $scope.getRandomName();
                 if (!$scope.isAllowed(randomName)) {
-                    console.log("Not permitted");
+                    console.warn("Not permitted: " + randomName);
                     return;
                 }
                 console.log("randomAdd()");

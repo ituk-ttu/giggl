@@ -30,9 +30,9 @@
             $scope.playing = bool;
         });
         $scope.autoPlay = function() {
-            console.log("autoPlay()");
+            console.debug("autoPlay()");
             if ($scope.autoPlayId > -1) {
-                console.log("Not starting another player thread, since it is already launched.");
+                console.warn("Not starting another player thread, since it is already launched.");
                 return;
             }
             $scope.randomAdd();
@@ -40,16 +40,16 @@
             $scope.autoPlayId = setInterval($scope.randomAdd, 10000);
         };
         $scope.stopAutoPlay = function() {
-            console.log("stopAutoPlay()");
+            console.debug("stopAutoPlay()");
             if ($scope.autoPlayId < 0) {
-                console.log("Nothing to stop.");
+                console.warn("Nothing to stop.");
                 return;
             }
             clearInterval($scope.autoPlayId);
             $scope.autoPlayId = -1;
         };
         $scope.share = function() {
-            console.log("share()");
+            console.debug("share()");
             $scope.shareLink = "https://youtu.be/" + $scope.current.id;
             document.getElementById("shareLink").hidden = false;
         };
@@ -65,7 +65,7 @@
             document.execCommand("copy");
         };
         $scope.loadFile = function() {
-            console.log("loadFile()");
+            console.debug("loadFile()");
             let file = document.getElementById("loadedFile").files[0];
             if (file) {
                 let reader = new FileReader();
@@ -74,25 +74,18 @@
             }
         };
         $scope.onFileLoad = function(evt) {
-            console.log("onFileLoad()");
-            $scope.counter = 0;
-            $scope.additions = 0;
+            console.debug("onFileLoad()");
             $scope.loadStatus = "Loading";
             $scope.loadedNames = [];
             let contents = evt.target.result;
-            console.log(contents);
             contents = contents.replace(/\r/g, "\n");
             contents = contents.split("\n");
-            console.log(contents);
             for (let i in contents) {
-                ++$scope.counter;
                 if (contents[i].length > 0) {
                     $scope.loadedNames.push(contents[i]);
-                    ++$scope.additions;
                 }
             }
-            console.log($scope.additions + "/" + $scope.counter);
-            console.log($scope.loadedNames);
+            console.info("Loaded lines: " + $scope.loadedNames.length + "/" + contents.length);
             $scope.loadStatus = "Done";
         };
         $scope.parseDuration = function(raw) {
@@ -119,7 +112,7 @@
         $scope.hasAllowedCharacters = function(s) {
             for (let c in s) {
                 if ("abcdefghijklmnopqrsšzžtuvwõäöüxyABCDEFGHIJKLMNOPQRSŠZŽTUVWÕÄÖÜXY0123456789 -&.,()".indexOf(s[c]) < 0) {
-                    console.warn("Invalid character: " + s[c] + " (unicode: " + s[c].charCodeAt(0) + ")");
+                    console.warn("Invalid character: " + s[c] + " (unicode: hex: " + s[c].charCodeAt(0).toString(16) + ")");
                     return false;
                 }
             }
@@ -132,10 +125,8 @@
             if ($scope.canAddRandom()) {
                 let randomName = $scope.getRandomName();
                 if (!$scope.isAllowed(randomName)) {
-                    console.warn("Not permitted: " + randomName);
                     return;
                 }
-                console.log("randomAdd()");
                 $http.get('https://www.googleapis.com/youtube/v3/search', {
                     params: {
                         key: 'AIzaSyAx4uk0wyOWLxB3n6YN19BQ_WiBIvjN2YA',
@@ -145,33 +136,47 @@
                         fields: 'items/id,items/snippet/title,items/snippet/description,items/snippet/thumbnails/default,items/snippet/channelTitle',
                         q: randomName
                     }
-                }).then(function(data) {
-                    if (data.data.items.length > 0) {
-                        let song = data.data.items[0];
-                        $http.get('https://www.googleapis.com/youtube/v3/videos', {
-                            params: {
-                                key: 'AIzaSyAx4uk0wyOWLxB3n6YN19BQ_WiBIvjN2YA',
-                                id: song.id.videoId,
-                                part: 'contentDetails',
-                                fields: 'items/contentDetails/duration'
-                            }
-                        }).then(function(data2) {
-                            if (data2.data.items.length > 0) {
-                                let songDuration = $scope.parseDuration(data2.data.items[0].contentDetails.duration);
-                                console.log("Duration: " + songDuration);
-                                if (songDuration > 20 && songDuration < 15*60) {
-                                    $scope.addById(song.id.videoId);
-                                }
-                            }
-                        });
+                }).then(songListData => {
+                    if (songListData.data.items.length === 0) {
+                        throw new Error("Could not find anything to play by search string: " + randomName);
                     }
+
+                    let song = songListData.data.items[0];
+                    $http.get('https://www.googleapis.com/youtube/v3/videos', {
+                        params: {
+                            key: 'AIzaSyAx4uk0wyOWLxB3n6YN19BQ_WiBIvjN2YA',
+                            id: song.id.videoId,
+                            part: 'contentDetails',
+                            fields: 'items/contentDetails/duration'
+                        }
+                    }).then(videoData => {
+                        if (videoData.data.items.length === 0) {
+                            throw new Error("Could not load video by ID: " + song.id.videoId);
+                        }
+
+                        let songDuration = $scope.parseDuration(videoData.data.items[0].contentDetails.duration);
+
+                        if (songDuration < 20) {
+                            throw new Error("Song too short: " + songDuration + " s");
+                        }
+
+                        if (songDuration > 15 * 60) {
+                            throw new Error("Song too long: " + songDuration + " s");
+                        }
+
+                        $scope.addById(song.id.videoId);
+                    }).catch(err => {
+                        throw new Error(err);
+                    });
+                }).catch(err => {
+                    console.warn("randomAdd(): " + err);
                 });
             }
         };
         $scope.getRandomName = function() {
             let randomId = Math.floor(Math.random() * $scope.loadedNames.length);
             let randomName = $scope.loadedNames[randomId];
-            console.log("Random (" + randomId + "): " + randomName);
+            console.debug("Random (" + randomId + "): " + randomName);
             return randomName;
         };
         $scope.add = function () {

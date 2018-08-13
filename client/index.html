@@ -62,6 +62,18 @@
                             <button class="btn btn-primary" ng-click="skip()">
                                 <i class="fa fa-forward"></i>
                             </button>
+                            <button ng-if="playlistMode" class="btn btn-success" ng-click="setPlaylistMode(false)">
+                                <i class="fa fa-list"></i>
+                            </button>
+                            <button ng-if="!playlistMode" class="btn btn-danger" ng-click="setPlaylistMode(true)">
+                                <i class="fa fa-list"></i>
+                            </button>
+                            <button ng-if="shuffle" class="btn btn-success" ng-click="setShuffle(false)">
+                                <i class="fa fa-refresh"></i>
+                            </button>
+                            <button ng-if="!shuffle" class="btn btn-danger" ng-click="setShuffle(true)">
+                                <i class="fa fa-refresh"></i>
+                            </button>
                         </div>
                         <div class="col-sm-4 col-xs-12">
                             <div slider ng-model="volume" start=1 end=100 class="slider"></div>

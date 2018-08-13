@@ -4,6 +4,8 @@
         socket.emit("get", true);
         $scope.current = null;
         $scope.playing = false;
+        $scope.playlistMode = false;
+        $scope.shuffle = false;
         $scope.list = [];
         $scope.new = "";
         $scope.volume = 1;
@@ -12,6 +14,12 @@
 
         socket.on("current", function (current) {
             $scope.current = current;
+        });
+        socket.on("playlistMode", function (value) {
+            $scope.playlistMode = value;
+        });
+        socket.on("shuffle", function (value) {
+            $scope.shuffle = value;
         });
         socket.on("list", function (list) {
             $scope.list = list;
@@ -80,6 +88,12 @@
         });
         $scope.play = function (bool) {
             socket.emit('playing', bool)
+        };
+        $scope.setPlaylistMode = function (bool) {
+            socket.emit('playlistMode', bool)
+        };
+        $scope.setShuffle = function (bool) {
+            socket.emit('shuffle', bool)
         };
         $scope.skip = function () {
             socket.emit('next', true);

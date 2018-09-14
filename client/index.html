@@ -62,16 +62,16 @@
                             <button class="btn btn-primary" ng-click="skip()">
                                 <i class="fa fa-forward"></i>
                             </button>
-                            <button ng-if="playlistMode" class="btn btn-success" ng-click="setPlaylistMode(false)">
+                            <button ng-if="playlistMode" class="btn btn-success" title="Repeat" ng-click="setPlaylistMode(false)">
                                 <i class="fa fa-refresh"></i>
                             </button>
-                            <button ng-if="!playlistMode" class="btn btn-danger" ng-click="setPlaylistMode(true)">
+                            <button ng-if="!playlistMode" class="btn btn-danger" title="Repeat" ng-click="setPlaylistMode(true)">
                                 <i class="fa fa-refresh"></i>
                             </button>
-                            <button ng-if="shuffle" class="btn btn-success" ng-click="setShuffle(false)">
+                            <button ng-if="shuffle" class="btn btn-success" title="Shuffle" ng-click="setShuffle(false)">
                                 <i class="fa fa-random"></i>
                             </button>
-                            <button ng-if="!shuffle" class="btn btn-danger" ng-click="setShuffle(true)">
+                            <button ng-if="!shuffle" class="btn btn-danger" title="Shuffle" ng-click="setShuffle(true)">
                                 <i class="fa fa-random"></i>
                             </button>
                         </div>

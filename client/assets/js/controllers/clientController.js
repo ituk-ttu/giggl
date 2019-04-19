@@ -93,12 +93,12 @@
             $scope.loadStatus = "Done";
         };
         $scope.parseDuration = function(raw) {
-            let m = /^[a-z]*(?:(\d+)M)?(\d+)S$/i.exec(raw);
+            let m = /^[a-z]*(?:(\d+)H)?(?:(\d+)M)?(\d+)S$/i.exec(raw);
             if (!m) return;
 
-            let minutes = m[1] ? parseInt(m[1], 10) : 0;
-            let seconds = m[2] ? parseInt(m[2], 10) : 0;
-            return minutes * 60 + seconds;
+            let hours = m[1] ? parseInt(m[1], 10) : 0;
+            let minutes = (m[2] ? parseInt(m[2], 10) : 0) + hours * 60;
+            return (m[3] ? parseInt(m[3], 10) : 0) + minutes * 60;
         };
         $scope.isAllowed = function(name) {
             if (name.length < 2) {

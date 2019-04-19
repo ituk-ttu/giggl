@@ -115,7 +115,7 @@
         };
         $scope.hasAllowedCharacters = function(s) {
             for (let c in s) {
-                if ("abcdefghijklmnopqrsšzžtuvwõäöüxyABCDEFGHIJKLMNOPQRSŠZŽTUVWÕÄÖÜXY0123456789 -&.,()".indexOf(s[c]) < 0) {
+                if ("abcdefghijklmnopqrsšzžtuvwõäöüxyABCDEFGHIJKLMNOPQRSŠZŽTUVWÕÄÖÜXY0123456789 -&.,()!#".indexOf(s[c]) < 0) {
                     console.warn("Invalid character: " + s[c] + " (unicode: hex: " + s[c].charCodeAt(0).toString(16) + ")");
                     return false;
                 }

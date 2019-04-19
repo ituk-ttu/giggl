@@ -75,14 +75,18 @@
         };
         $scope.onFileLoad = function(evt) {
             console.debug("onFileLoad()");
+            $scope.counter = 0;
+            $scope.additions = 0;
             $scope.loadStatus = "Loading";
             $scope.loadedNames = [];
             let contents = evt.target.result;
             contents = contents.replace(/\r/g, "\n");
             contents = contents.split("\n");
             for (let i in contents) {
+                ++$scope.counter;
                 if (contents[i].length > 0) {
                     $scope.loadedNames.push(contents[i]);
+                    ++$scope.additions;
                 }
             }
             console.info("Loaded lines: " + $scope.loadedNames.length + "/" + contents.length);
@@ -102,7 +106,7 @@
                 return false;
             }
 
-            if (name.length >= 60) {
+            if (name.length >= 68) {
                 console.warn("Name too long: " + name.length);
                 return false;
             }

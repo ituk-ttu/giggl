@@ -48,7 +48,11 @@
                         <span ng-if="current.id != null">
                             <h3 ng-if="playing" class="text-success">Playing:</h3>
                             <h3 ng-if="!playing" class="text-danger">Paused:</h3>
-                            <p>{{current.info.title}} ({{current.display}}/{{prettyLength(current.info.duration)}})</p>
+                            <p>{{current.info.title}} ({{current.display}}/{{prettyLength(current.info.duration)}})
+                            <button ng-click="share()" id="shareButton" style="float: right;">Share</button>
+                            <input title="click to copy" id="shareLink" type="text" readonly="readonly"
+                                   ng-model="shareLink"
+                                   hidden ng-click="copyLink()"></p>
                         </span>
                     </div>
                     <div class="col-lg-4 col-md-6 col-sm-12">
@@ -81,6 +85,18 @@
                     </div>
                 </div>
                 <div class="add col-xs-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <form>
+                                <input type="file" class="form-control" placeholder="<empty>" id="loadedFile"/>
+                                <button ng-click="selectFile()">Choose File</button>
+                                {{loadStatus}}: {{additions}} / {{counter}}
+                            </form>
+                        </div>
+                        <button class="btn btn-success" ng-click="loadFile()">Load</button>
+                        <button class="btn btn-success" ng-click="autoPlay()">AutoPlay</button>
+                        <button class="btn btn-danger" ng-click="stopAutoPlay()">Stop AutoPlay</button>
+                    </div>
                     <div class="form-group">
                         <form ng-submit="add()">
                             <div class="input-group">

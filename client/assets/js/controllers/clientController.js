@@ -131,7 +131,7 @@
             return true;
         };
         $scope.canAddRandom = function() {
-            return $scope.list.length < 3;
+            return $scope.list.length < 5;
         };
         $scope.randomAdd = function() {
             if ($scope.canAddRandom()) {

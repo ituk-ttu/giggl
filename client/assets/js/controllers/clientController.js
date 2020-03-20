@@ -191,6 +191,9 @@
             return randomName;
         };
         $scope.addByUrl = function (url) {
+            if ($scope.list.length === 0 && $scope.current === null) {
+                setTimeout(function() {$scope.play(true);}, 2000);
+            }
             socket.emit("add", url);
         };
         $scope.add = function () {

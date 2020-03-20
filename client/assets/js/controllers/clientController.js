@@ -44,7 +44,6 @@
                 return;
             }
             $scope.randomAdd();
-            setTimeout(function() {$scope.play(true);}, 2000);
             $scope.autoPlayId = setInterval($scope.randomAdd, 10000);
         };
         $scope.stopAutoPlay = function() {
@@ -191,8 +190,11 @@
             console.debug("Random (" + randomId + "): " + randomName);
             return randomName;
         };
+        $scope.addByUrl = function (url) {
+            socket.emit("add", url);
+        };
         $scope.add = function () {
-            socket.emit("add", $scope.new);
+            $scope.addByUrl($scope.new);
             $scope.new = "";
         };
         $scope.remove = function (index) {
@@ -218,7 +220,7 @@
         });
         $scope.addById = function (id) {
             console.log("Adding by ID: " + id);
-            socket.emit("add", "https://www.youtube.com/watch?v=" + id);
+            $scope.addByUrl("https://www.youtube.com/watch?v=" + id);
             $scope.clearSearch();
         };
         $scope.clearSearch = function() {

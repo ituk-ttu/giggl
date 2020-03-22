@@ -88,18 +88,6 @@
                 </div>
                 <div class="add col-xs-12">
                     <div class="form-group">
-                        <div class="input-group">
-                            <form>
-                                <input type="file" class="form-control" placeholder="<empty>" id="loadedFile"/>
-                                <button ng-click="selectFile()">Choose File</button>
-                                {{loadStatus}}: {{additions}} / {{counter}}
-                            </form>
-                        </div>
-                        <button class="btn btn-success" ng-click="loadFile()">Load</button>
-                        <button class="btn btn-success" ng-click="autoPlay()">AutoPlay</button>
-                        <button class="btn btn-danger" ng-click="stopAutoPlay()">Stop AutoPlay</button>
-                    </div>
-                    <div class="form-group">
                         <form ng-submit="add()">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="url" ng-model="new">
@@ -126,6 +114,30 @@
                                 </md-list-item>
                             </md-list>
                         </form>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <form>
+                                <input type="file" class="form-control" placeholder="<empty>" id="loadedFile"/>
+                                <button ng-click="selectFile()">Choose File</button>
+                            </form>
+                        </div>
+                        <div>
+                            <button class="btn btn-success" ng-click="loadFile()">Load</button>
+                            <button ng-if="autoPlayId === -1"
+                                    class="btn btn-secondary"
+                                    ng-click="autoPlay()"
+                            >
+                                AutoPlay
+                            </button>
+                            <button ng-if="autoPlayId > -1"
+                                    class="btn btn-success"
+                                    ng-click="stopAutoPlay()"
+                            >
+                                AutoPlay
+                            </button>
+                            <div>{{loadStatus}}: {{additions}} / {{counter}}</div>
+                        </div>
                     </div>
                 </div>
                 <div class="playlist col-xs-12">
